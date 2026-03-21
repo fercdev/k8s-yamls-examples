@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: script-cm
+data:
+  script.sh: |
+    #!/bin/sh
+    echo "Hola desde el script"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-script-cm
+spec:
+  containers:
+  - name: app-cm
+    image: busybox
+    command: ["sh", "/scripts/script.sh"]
+
+    volumeMounts:
+      - name: script-vol
+        mountPath: /scripts
+  volumes:
+    - name: script-vol
+      configMap:
+        name: script-cm

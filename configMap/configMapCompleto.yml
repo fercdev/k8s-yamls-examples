@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ejemplo-completo
+  # namespace: default o utilizar uno custom
+  labels:
+    app: mi-app
+    env: dev
+  annotations:
+    description: "ConfigMap de ejemplo con sus atributos"
+data:
+  APP_ENV: "production"
+  APP_PORT: "3000"
+
+  config.json: |
+    {
+      "debug": true,
+      "timeout": 5000
+    }
+  script.sh: |
+    #!/bin/sh
+    echo "Hola desde mi configMap"
