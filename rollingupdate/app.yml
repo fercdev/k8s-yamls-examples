@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  mensaje: "Version 2"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+      annotations:
+        config-version: "v2"
+    spec:
+      containers:
+      - name: app-container
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            while true; do
+              echo "Mensaje actual: ";
+              cat /config/mensaje;
+              sleep 5;
+            done
+        volumeMounts:
+          - name: config-vol
+            mountPath: /config
+      volumes:
+        - name: config-vol
+          configMap:
+            name: app-config
