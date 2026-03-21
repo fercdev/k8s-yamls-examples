@@ -1,0 +1,6 @@
+apiVersion: <group>/<version>
+kind: <ResourceKind>
+metadata:
+  name: nombre-recurso-example
+spec:
+  
