@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-completo
+  name: pod-completo      # nombre del pod
   labels:
     app: mi-app
   annotations:
@@ -9,11 +9,11 @@ metadata:
 spec:
   restartPolicy: Always # OnFailure, Never, Always(default)
   initContainers:
-    - name: init-container
+    - name: init-container      # nombre del contenedor de inicialización
       image: busybox
       command: ['sh', '-c', 'echo Iniciando... && sleep 5']
   containers:
-    - name: app
+    - name: app               # nombre del contenedor principal
       image: nginx:alpine
       ports:
         - containerPort: 80
