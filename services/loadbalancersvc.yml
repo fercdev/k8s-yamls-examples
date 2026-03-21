@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-loadbalancer
+  labels:
+    app: mi-app
+spec:
+  type: LoadBalancer ## este recurso solicita la creacion (nube) de un LoadBalancer (con una IP publica externa) para exponer el servicio fuera del cluster
+
+  selector:
+    app: myapp
+  
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
