@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mypvc
+spec:
+  resources:
+    requests:
+      storage: 500Mi      ## cuanto pide (la solicitud)
+  volumeMode: Filesystem    ## el modo de volumen (FS - Block)
+  accessModes:
+    - ReadWriteOnce # RWO (ReadWriteOnce) - RWX (ReadWriteMany) - ROX (ReadOnlyMany)
