@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: standard
+provisioner: k8s.io/minikube-hostpath ##define quien va a crear el volumen fisico (o logico)
+            # kubernetes.io/aws-ebs  -- azure-> disck.csi.azure.com
+reclaimPolicy: Delete # Retain
+volumeBindingMode: Immediate ## WaitForFirstConsumer --> espera a que el pod exista
+allowVolumeExpansion: true ## permite aumentar el tamaño del volumen despues
+parameters: {} ## depende mucho del "provisioner" y tendria que validar con la documentacion

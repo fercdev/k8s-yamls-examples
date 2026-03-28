@@ -3,6 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: pvc-logs
 spec:
+  #storageClassName: standard # con este atributo se logra asociar a la plantilla del StorageClass "standard"
   resources:
     requests:
       storage: 300Mi
