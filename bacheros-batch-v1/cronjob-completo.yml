@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ejemplo-cronjob
+spec:
+  schedule: "* * * * *" # Ejecutar cada minut
+  concurrencyPolicy: Allow
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mi-cronjob-container
+            image: busybox
+            command: ["sh", "-c", "echo hola mundo desde mi CronJob && sleep 5"]
+          restartPolicy: Never
