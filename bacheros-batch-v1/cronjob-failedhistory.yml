@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: failing-cronjob
+spec:
+  schedule: "* * * * *" # Ejecutar cada minut
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Allow
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+          - name: failed-container
+            image: busybox
+            command: ["sh", "-c", "echo Fallando && exit 1"]
+          restartPolicy: Never
