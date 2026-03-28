@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+type: Opaque
+stringData:
+  MYSQL_ROOT_PASSWORD: rootpass
+  MYSQL_PASSWORD: demo_pass
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  type: ClusterIP
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  serviceName: "mysql"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql-container
+          image: fercdevv/mysql-project-paths:latest
+          ports:
+            - containerPort: 3306
+          
+          env:
+            - name: MYSQL_DATABASE
+              value: demo_db
+            - name: MYSQL_USER
+              value: demo_user
+            - name: MYSQL_ROOT_PASSWORD_FILE_PATH
+              value: /run/custom/secrets/MYSQL_ROOT_PASSWORD
+            - name: MYSQL_PASSWORD_FILE_PATH
+              value: /run/custom/secrets/MYSQL_PASSWORD 
+          
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+          
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: secret-volume
+              mountPath: /run/custom/secrets
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: mysql-secret
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+    - port: 4000
+      targetPort: 4000
+      nodePort: 30001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: fercdevv/backend-project:latest
+          ports:
+            - containerPort: 4000
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_NAME
+              value: demo_db
+            - name: DB_USER
+              value: demo_user
+            - name: DB_PASS
+              value: demo_pass
+            - name: DB_PORT
+              value: "3306"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /users
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /users
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 20
